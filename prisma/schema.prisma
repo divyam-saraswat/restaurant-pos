@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  color     String?
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model MenuItem {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  isAvailable Boolean     @default(true)
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Table {
+  id        String   @id @default(uuid())
+  number    Int      @unique
+  capacity  Int
+  status    String   @default("AVAILABLE") // AVAILABLE, OCCUPIED, RESERVED
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  orderNumber   Int         @unique @default(autoincrement())
+  status        String      @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
+  type          String      @default("DINE_IN") // DINE_IN, TAKEAWAY, DELIVERY
+  totalAmount   Float
+  tableId       String?
+  table         Table?      @relation(fields: [tableId], references: [id])
+  items         OrderItem[]
+  payment       Payment?
+  customerName  String?
+  customerPhone String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id])
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  quantity   Int
+  unitPrice  Float
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+  amount        Float
+  method        String   // CASH, CARD, UPI
+  status        String   @default("COMPLETED") // PENDING, COMPLETED, FAILED
+  transactionId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

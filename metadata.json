@@ -1,0 +1,6 @@
+{
+  "name": "Offline-First Cashier POS",
+  "description": "A Next.js style offline-first Cashier Point of Sale (POS) application using Dexie.js for local storage.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
